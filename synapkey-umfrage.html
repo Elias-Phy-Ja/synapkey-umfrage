@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Synapkey Beta Tester Kit</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --border: #E5E1D8;
+    --text: #1A1916;
+    --muted: #8A8680;
+    --accent: #2563EB;
+    --accent-light: #EFF4FF;
+    --green: #16A34A;
+    --green-light: #F0FDF4;
+    --amber: #D97706;
+    --amber-light: #FFFBEB;
+    --purple: #7C3AED;
+    --purple-light: #F3F0FF;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 48px 24px 80px;
+  }
+
+  .container { max-width: 720px; margin: 0 auto; }
+
+  .header { margin-bottom: 48px; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 100px;
+    border: 1px solid #BFDBFE;
+    margin-bottom: 20px;
+  }
+
+  .badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 40px;
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+
+  h1 em { font-style: italic; color: var(--accent); }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--muted);
+    font-weight: 300;
+    max-width: 520px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 2px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 32px;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 9px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--muted);
+  }
+
+  .tab.active { background: var(--accent); color: white; }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .info-box {
+    background: var(--accent-light);
+    border: 1px solid #BFDBFE;
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 14px;
+    color: #1D4ED8;
+    margin-bottom: 24px;
+    line-height: 1.55;
+  }
+
+  .progress-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .progress-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .progress-bar {
+    flex: 1;
+    height: 5px;
+    background: var(--border);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 100px;
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+
+  .progress-count {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    white-space: nowrap;
+    min-width: 44px;
+    text-align: right;
+  }
+
+  .tasks { display: flex; flex-direction: column; gap: 10px; }
+
+  .task {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    transition: border-color 0.15s;
+  }
+
+  .task:hover { border-color: #C7D2FE; }
+
+  .task-check {
+    width: 18px; height: 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 5px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .task-check.checked { background: var(--accent); border-color: var(--accent); }
+  .task-check.checked::after { content: '✓'; color: white; font-size: 11px; font-weight: 700; }
+
+  .task-content { flex: 1; }
+
+  .task-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+  .task-desc  { font-size: 13px; color: var(--muted); font-weight: 300; }
+
+  .task-tag {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 500;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .tag-core { background: var(--accent-light); color: var(--accent); }
+  .tag-ux   { background: var(--green-light);  color: var(--green); }
+  .tag-edge { background: var(--amber-light);  color: var(--amber); }
+  .tag-free { background: var(--purple-light); color: var(--purple); }
+
+  .questions { display: flex; flex-direction: column; gap: 12px; }
+
+  .question {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+
+  .question.info-card { background: var(--accent-light); border-color: #BFDBFE; }
+
+  .q-label { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+
+  .info-card .q-label {
+    color: var(--accent);
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .q-hint { font-size: 12px; color: var(--muted); margin-bottom: 14px; font-weight: 300; }
+
+  .input-group { display: flex; flex-direction: column; gap: 10px; }
+
+  .input-row label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+
+  input[type=text], textarea {
+    width: 100%;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  textarea { resize: vertical; min-height: 88px; }
+  input[type=text]:focus, textarea:focus { border-color: var(--accent); }
+
+  .scale { display: flex; gap: 6px; }
+
+  .scale-btn {
+    flex: 1;
+    aspect-ratio: 1;
+    max-width: 48px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--muted);
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.12s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .scale-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .scale-btn.selected { background: var(--accent); border-color: var(--accent); color: white; }
+
+  .scale-labels { display: flex; justify-content: space-between; margin-top: 8px; }
+  .scale-labels span { font-size: 11px; color: var(--muted); font-weight: 300; }
+
+  .choices { display: flex; flex-direction: column; gap: 8px; }
+
+  .choice {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.12s;
+    font-size: 14px;
+    user-select: none;
+  }
+
+  .choice:hover { border-color: var(--accent); }
+  .choice.selected { background: var(--accent-light); border-color: var(--accent); color: #1D4ED8; }
+
+  .choice-dot {
+    width: 15px; height: 15px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
+    transition: all 0.12s;
+  }
+
+  .choice.selected .choice-dot { background: var(--accent); border-color: var(--accent); }
+
+  .submit-section {
+    margin-top: 28px;
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .submit-section p { font-size: 13px; color: var(--muted); margin-bottom: 16px; font-weight: 300; }
+
+  .btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 11px 28px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .btn:hover { opacity: 0.85; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .error-msg {
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    color: #DC2626;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    margin-bottom: 14px;
+    display: none;
+    text-align: left;
+  }
+
+  #successPage {
+    display: none;
+    text-align: center;
+    padding: 64px 24px;
+  }
+
+  .success-icon {
+    width: 64px; height: 64px;
+    background: var(--green-light);
+    border: 1px solid #BBF7D0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    color: var(--green);
+    margin: 0 auto 28px;
+    font-weight: 700;
+  }
+
+  #successPage h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 34px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    margin-bottom: 14px;
+  }
+
+  #successPage .lead {
+    font-size: 15px;
+    color: var(--muted);
+    font-weight: 300;
+    max-width: 400px;
+    margin: 0 auto 36px;
+    line-height: 1.65;
+  }
+
+  .success-card {
+    background: var(--green-light);
+    border: 1px solid #BBF7D0;
+    border-radius: 12px;
+    padding: 24px 28px;
+    max-width: 460px;
+    margin: 0 auto 32px;
+    text-align: left;
+  }
+
+  .success-card .card-label {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--green);
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .success-card p { font-size: 14px; color: #166534; line-height: 1.65; font-weight: 300; }
+
+  .footer-note {
+    margin-top: 48px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    font-family: 'Geist Mono', monospace;
+  }
+
+  .footer-note a { color: var(--accent); text-decoration: none; }
+
+  @media (max-width: 500px) {
+    h1 { font-size: 30px; }
+    .scale-btn { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="badge">Beta v0.1 &nbsp; Nur fuer Tester</div>
+    <h1>Synapkey<br><em>Beta Tester Kit</em></h1>
+    <p class="subtitle">Danke, dass du dir Zeit nimmst. Dein Feedback hilft direkt dabei, die App besser zu machen. Bitte sei ehrlich.</p>
+  </div>
+
+  <div class="tabs" id="mainTabs">
+    <div class="tab active" onclick="switchTab('tasks')">&#9312; Aufgabenliste</div>
+    <div class="tab" onclick="switchTab('form')">&#9313; Feedback-Umfrage</div>
+  </div>
+
+  <!-- TASKS TAB -->
+  <div class="tab-content active" id="tab-tasks">
+
+    <div class="info-box">
+      Arbeite die Aufgaben der Reihe nach durch. Notiere dir kurz, wenn etwas nicht funktioniert hat oder dich ueberrascht hat. Das hilft dir dann bei der Umfrage.
+    </div>
+
+    <div class="progress-wrap">
+      <span class="progress-label">Fortschritt</span>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <span class="progress-count" id="progressCount">0 / 17</span>
+    </div>
+
+    <div class="tasks">
+
+      <div class="task" data-id="0">
+        <div class="task-check" onclick="toggleTask(this)"></div>
+        <div class="task-content">
+          <div class="task-title">Account erstellen</div>
+          <div class="task-desc">Registriere dich mit deiner E-Mail-Adresse. Schau, ob der Prozess verstaendlich ist und ob die Bestaedigungsmail ankommt.</div>
+        </div>
+        <span class="task-tag tag-core">Core</span>
+      </div>
+
+      <div class="task" data-id="1">
+        <div class="task-check" onclick="toggleTask(this)"></div>
+        <div class="task-content">
+          <div class="task-title">API-Key eintragen</div>
+          <div class="task-desc">Trage deinen Gemini API-Key ein. Schau, ob du ohne Erklaerung verstehst, was hier verlangt wird und wo du den Key bekommst.</div>
+        </div>
+        <span class="task-tag tag-core">Core</span>
+      </div>
+
+      <div class="task" data-id="2">
+        <div class="task-check" onclick="toggleTask(this)"></div>
+        <div class="task-content">
+          <div class="task-title">Erstes Foto hochladen</div>
+          <div class="task-desc">Lade ein Foto von handgeschriebenen Notizen hoch. Achte darauf, wie lange es dauert und ob du weisst, was als naechstes passiert.</div>
+        </div>
+        <span class="task-tag tag-core">Core</span>
+      </div>
+
+      <div class="task" data-id="3">
+        <div class="task-check" onclick="toggleTask(this)"></div>
+        <div class="task-content">
+          <div class="task-title">Slide oder Folie hochladen</div>
+          <div class="task-desc">Lade jetzt ein Foto von einer Folie hoch. Vergleiche das Ergebnis mit dem ersten Upload.</div>
+        </div>
+        <span class="task-tag tag-core">Core</span>
+      </div>
+
+      <div class="task" data-id="4">
+        <div class="task-check" onclick="toggleTask(this)"></div>
+        <div class="task-content">
+          <div class="task-title">Zusammenfassung lesen und beurteilen</div>
+          <div class="task-desc">Lies die generierte Zusammenfassung. Ist sie korrekt, vollstaendig und nuetzlich? Fehlt etwas Wichtiges?</div>
+        </div>
+        <span class="task-tag tag-core">Core</span>
+      </div>
+
+      <div class="task" data-id="5">
+        <div class="task-check" onclick="toggleTask(this)"></div>
+        <div class="task-content">
+          <div class="task-title">Alle Flashcards durchgehen</div>
+          <div class="task-desc">Gehe alle generierten Flashcards durch. Sind die Fragen sinnvoll und die Antworten korrekt?</div>
+        </div>
+        <span class="task-tag tag-core">Core</span>
+      </div>
+
+      <div class="task" data-id="6">
+        <div class="task-check" onclick="toggleTask(this)"></div>
+        <div class="task-content">
+          <div class="task-title">Quiz absolvieren</div>
+          <div class="task-desc">Starte das Quiz und beantworte alle Fragen. Schau, ob die Fragen zum Inhalt passen und ob das Ergebnis am Ende sinnvoll angezeigt wird.</div>
+        </div>
+        <span class="task-tag tag-core">Core</span>
+      </div>
+
+      <div class="task" data-id="7">
+        <div class="task-check" onclick="toggleTask(this)"></div>
+        <div class="task-content">
+          <div class="task-title">Alten Upload nochmals oeffnen</div>
+          <div class="task-desc">Gehe zu einem frueheren Upload und oeffne ihn nochmals. Sind Zusammenfassung und Flashcards noch vorhanden?</div>
+        </div>
+        <span class="task-tag tag-core">Core</span>
+      </div>
+
+      <div class="task" data-id="8">
+        <div class="task-check" onclick="toggleTask(this)"></div>
+        <div class="task-content">
+          <div class="task-title">Profilnamen aendern</div>
+          <div class="task-desc">Gehe in die Einstellungen und aendere deinen Anzeigenamen. Wird die Aenderung gespeichert?</div>
+        </div>
+        <span class="task-tag tag-ux">UX</span>
+      </div>
+
+      <div class="task" data-id="9">
+        <div class="task-check" onclick="toggleTask(this)"></div>
+        <div class="task-content">
+          <div class="task-title">Passwort aendern</div>
+          <div class="task-desc">Versuche dein Passwort in den Einstellungen zu aendern. Funktioniert der Ablauf?</div>
+        </div>
+        <span class="task-tag tag-ux">UX</span>
+      </div>
+
+      <div class="task" data-id="10">
+        <div class="task-check" onclick="toggleTask(this)"></div>
+        <div class="task-content">
+          <div class="task-title">Support kontaktieren</div>
+          <div class="task-desc">Schreibe eine Nachricht ans Support-Team, zum Beispiel eine Frage oder einen Bug. Kommt eine Bestaetigung?</div>
+        </div>
+        <span class="task-tag tag-ux">UX</span>
+      </div>
+
+      <div class="task" data-id="11">
+        <div class="task-check" onclick="toggleTask(this)"></div>
+        <div class="task-content">
+          <div class="task-title">App auf dem Handy testen</div>
+          <div class="task-desc">Oeffne Synapkey auf deinem Smartphone. Sieht alles gut aus? Funktioniert der Upload auch mobil?</div>
+        </div>
+        <span class="task-tag tag-ux">UX</span>
+      </div>
+
+      <div class="task" data-id="12">
+        <div class="task-check" onclick="toggleTask(this)"></div>
+        <div class="task-content">
+          <div class="task-title">Unlesbares Bild hochladen</div>
+          <div class="task-desc">Lade ein komplett verschwommenes oder dunkles Foto hoch. Gibt es eine verstaendliche Fehlermeldung?</div>
+        </div>
+        <span class="task-tag tag-edge">Edge</span>
+      </div>
+
+      <div class="task" data-id="13">
+        <div class="task-check" onclick="toggleTask(this)"></div>
+        <div class="task-content">
+          <div class="task-title">Falschen API-Key eingeben</div>
+          <div class="task-desc">Trage absichtlich einen ungueltigen Key ein und versuche einen Upload. Was zeigt die App an?</div>
+        </div>
+        <span class="task-tag tag-edge">Edge</span>
+      </div>
+
+      <div class="task" data-id="14">
+        <div class="task-check" onclick="toggleTask(this)"></div>
+        <div class="task-content">
+          <div class="task-title">Browser-Tab schliessen und neu oeffnen</div>
+          <div class="task-desc">Schliesse den Tab mitten in einer Aktion und oeffne die App neu. Sind deine Daten noch da?</div>
+        </div>
+        <span class="task-tag tag-edge">Edge</span>
+      </div>
+
+      <div class="task" data-id="15">
+        <div class="task-check" onclick="toggleTask(this)"></div>
+        <div class="task-content">
+          <div class="task-title">Abmelden und wieder einloggen</div>
+          <div class="task-desc">Melde dich ab und dann wieder an. Sind alle Uploads und Inhalte noch vorhanden?</div>
+        </div>
+        <span class="task-tag tag-edge">Edge</span>
+      </div>
+
+      <div class="task" data-id="16">
+        <div class="task-check" onclick="toggleTask(this)"></div>
+        <div class="task-content">
+          <div class="task-title">Erkunde selbst</div>
+          <div class="task-desc">Klicke dich frei durch die App. Probiere was du willst, schau was dir auffaellt und notiere alles, was du in der Umfrage noch erwaehnen moechtest.</div>
+        </div>
+        <span class="task-tag tag-free">Frei</span>
+      </div>
+
+    </div>
+
+    <div style="margin-top: 24px; text-align: right;">
+      <button class="btn" onclick="switchTab('form')">Weiter zur Umfrage &rarr;</button>
+    </div>
+  </div>
+
+  <!-- FORM TAB -->
+  <div class="tab-content" id="tab-form">
+    <div class="questions">
+
+      <div class="question info-card">
+        <div class="q-label">Deine Angaben</div>
+        <div class="input-group">
+          <div class="input-row">
+            <label>Vor- und Nachname</label>
+            <input type="text" id="f-name" placeholder="z.B. Luca Meier">
+          </div>
+          <div class="input-row">
+            <label>E-Mail-Adresse</label>
+            <input type="text" id="f-email" placeholder="z.B. luca@beispiel.ch">
+          </div>
+          <div class="input-row">
+            <label>Geraet, auf dem du getestet hast</label>
+            <input type="text" id="f-device" placeholder="z.B. iPhone 14, MacBook, Windows-PC">
+          </div>
+        </div>
+      </div>
+
+      <div class="question">
+        <div class="q-label">1. Wie einfach war der Einstieg? (Registrierung und API-Key)</div>
+        <div class="q-hint">1 = sehr verwirrend &nbsp;·&nbsp; 5 = sofort klar</div>
+        <div class="scale" data-q="q1">
+          <div class="scale-btn" onclick="selectScale(this,'q1')">1</div>
+          <div class="scale-btn" onclick="selectScale(this,'q1')">2</div>
+          <div class="scale-btn" onclick="selectScale(this,'q1')">3</div>
+          <div class="scale-btn" onclick="selectScale(this,'q1')">4</div>
+          <div class="scale-btn" onclick="selectScale(this,'q1')">5</div>
+        </div>
+        <div class="scale-labels"><span>Sehr verwirrend</span><span>Sofort klar</span></div>
+      </div>
+
+      <div class="question">
+        <div class="q-label">2. Wie war die Qualitaet der Zusammenfassung?</div>
+        <div class="q-hint">1 = voellig unbrauchbar &nbsp;·&nbsp; 5 = besser als erwartet</div>
+        <div class="scale" data-q="q2">
+          <div class="scale-btn" onclick="selectScale(this,'q2')">1</div>
+          <div class="scale-btn" onclick="selectScale(this,'q2')">2</div>
+          <div class="scale-btn" onclick="selectScale(this,'q2')">3</div>
+          <div class="scale-btn" onclick="selectScale(this,'q2')">4</div>
+          <div class="scale-btn" onclick="selectScale(this,'q2')">5</div>
+        </div>
+        <div class="scale-labels"><span>Unbrauchbar</span><span>Besser als erwartet</span></div>
+      </div>
+
+      <div class="question">
+        <div class="q-label">3. Wie nuetzlich waren die Flashcards?</div>
+        <div class="q-hint">1 = habe ich selbst besser gemacht &nbsp;·&nbsp; 5 = deutlich zeitsparend</div>
+        <div class="scale" data-q="q3">
+          <div class="scale-btn" onclick="selectScale(this,'q3')">1</div>
+          <div class="scale-btn" onclick="selectScale(this,'q3')">2</div>
+          <div class="scale-btn" onclick="selectScale(this,'q3')">3</div>
+          <div class="scale-btn" onclick="selectScale(this,'q3')">4</div>
+          <div class="scale-btn" onclick="selectScale(this,'q3')">5</div>
+        </div>
+        <div class="scale-labels"><span>Selbst besser</span><span>Deutlich zeitsparend</span></div>
+      </div>
+
+      <div class="question">
+        <div class="q-label">4. Wie nuetzlich war das Quiz?</div>
+        <div class="q-hint">1 = voellig nutzlos &nbsp;·&nbsp; 5 = sehr hilfreich zum Lernen</div>
+        <div class="scale" data-q="q4">
+          <div class="scale-btn" onclick="selectScale(this,'q4')">1</div>
+          <div class="scale-btn" onclick="selectScale(this,'q4')">2</div>
+          <div class="scale-btn" onclick="selectScale(this,'q4')">3</div>
+          <div class="scale-btn" onclick="selectScale(this,'q4')">4</div>
+          <div class="scale-btn" onclick="selectScale(this,'q4')">5</div>
+        </div>
+        <div class="scale-labels"><span>Nutzlos</span><span>Sehr hilfreich</span></div>
+      </div>
+
+      <div class="question">
+        <div class="q-label">5. Wie war das Design und die Navigation insgesamt?</div>
+        <div class="q-hint">1 = unuebersichtlich &nbsp;·&nbsp; 5 = sehr angenehm</div>
+        <div class="scale" data-q="q5">
+          <div class="scale-btn" onclick="selectScale(this,'q5')">1</div>
+          <div class="scale-btn" onclick="selectScale(this,'q5')">2</div>
+          <div class="scale-btn" onclick="selectScale(this,'q5')">3</div>
+          <div class="scale-btn" onclick="selectScale(this,'q5')">4</div>
+          <div class="scale-btn" onclick="selectScale(this,'q5')">5</div>
+        </div>
+        <div class="scale-labels"><span>Unuebersichtlich</span><span>Sehr angenehm</span></div>
+      </div>
+
+      <div class="question">
+        <div class="q-label">6. Wie schnell hat die App auf deine Aktionen reagiert?</div>
+        <div class="q-hint">1 = sehr langsam &nbsp;·&nbsp; 5 = sehr schnell</div>
+        <div class="scale" data-q="q6">
+          <div class="scale-btn" onclick="selectScale(this,'q6')">1</div>
+          <div class="scale-btn" onclick="selectScale(this,'q6')">2</div>
+          <div class="scale-btn" onclick="selectScale(this,'q6')">3</div>
+          <div class="scale-btn" onclick="selectScale(this,'q6')">4</div>
+          <div class="scale-btn" onclick="selectScale(this,'q6')">5</div>
+        </div>
+        <div class="scale-labels"><span>Sehr langsam</span><span>Sehr schnell</span></div>
+      </div>
+
+      <div class="question">
+        <div class="q-label">7. Welches Feature hat dir am meisten gebracht?</div>
+        <div class="q-hint">Nur eine Antwort waehlen.</div>
+        <div class="choices" data-q="q7">
+          <div class="choice" onclick="selectChoice(this,'q7')"><div class="choice-dot"></div>Zusammenfassung</div>
+          <div class="choice" onclick="selectChoice(this,'q7')"><div class="choice-dot"></div>Flashcards</div>
+          <div class="choice" onclick="selectChoice(this,'q7')"><div class="choice-dot"></div>Quiz</div>
+          <div class="choice" onclick="selectChoice(this,'q7')"><div class="choice-dot"></div>Keines hat mich wirklich ueberzeugt</div>
+        </div>
+      </div>
+
+      <div class="question">
+        <div class="q-label">8. Hast du die App auch auf dem Handy getestet?</div>
+        <div class="choices" data-q="q8">
+          <div class="choice" onclick="selectChoice(this,'q8')"><div class="choice-dot"></div>Ja, hat gut funktioniert</div>
+          <div class="choice" onclick="selectChoice(this,'q8')"><div class="choice-dot"></div>Ja, aber es gab Probleme</div>
+          <div class="choice" onclick="selectChoice(this,'q8')"><div class="choice-dot"></div>Nein, nur am Computer getestet</div>
+        </div>
+      </div>
+
+      <div class="question">
+        <div class="q-label">9. Ist irgendetwas abgestuerzt oder nicht geladen?</div>
+        <div class="q-hint">Beschreibe kurz was passiert ist und bei welcher Aufgabe.</div>
+        <textarea id="f-q9" placeholder="z.B. Beim Hochladen des Bildes ist nichts passiert und kein Fehler erschienen."></textarea>
+      </div>
+
+      <div class="question">
+        <div class="q-label">10. Gab es Fehlermeldungen, die du nicht verstanden hast?</div>
+        <div class="q-hint">Schreib die Meldung hin, wenn du sie noch weisst.</div>
+        <textarea id="f-q10" placeholder="z.B. Es stand nur Error 500 und ich wusste nicht was das bedeutet."></textarea>
+      </div>
+
+      <div class="question">
+        <div class="q-label">11. Was hat dich am meisten verwirrt oder gestoert?</div>
+        <div class="q-hint">Sei direkt, konstruktive Kritik ist das Wertvollste.</div>
+        <textarea id="f-q11" placeholder="z.B. Ich habe nicht verstanden warum ich einen API-Key brauche."></textarea>
+      </div>
+
+      <div class="question">
+        <div class="q-label">12. Was hat dich positiv ueberrascht?</div>
+        <div class="q-hint">Was war besser als erwartet?</div>
+        <textarea id="f-q12" placeholder="z.B. Die Zusammenfassung war viel praeziser als ich dachte."></textarea>
+      </div>
+
+      <div class="question">
+        <div class="q-label">13. Was fehlt dir, damit du die App regelmaessig nutzen wuerdest?</div>
+        <textarea id="f-q13" placeholder="z.B. Ich wuerde gerne mehrere Fotos auf einmal hochladen."></textarea>
+      </div>
+
+      <div class="question">
+        <div class="q-label">14. Wuerdest du Synapkey fuer die Schule oder das Studium verwenden?</div>
+        <div class="choices" data-q="q14">
+          <div class="choice" onclick="selectChoice(this,'q14')"><div class="choice-dot"></div>Ja, sofort</div>
+          <div class="choice" onclick="selectChoice(this,'q14')"><div class="choice-dot"></div>Ja, sobald ein paar Dinge besser sind</div>
+          <div class="choice" onclick="selectChoice(this,'q14')"><div class="choice-dot"></div>Wahrscheinlich nicht</div>
+          <div class="choice" onclick="selectChoice(this,'q14')"><div class="choice-dot"></div>Nein</div>
+        </div>
+      </div>
+
+      <div class="question">
+        <div class="q-label">15. Wuerdest du Synapkey einem Kollegen empfehlen?</div>
+        <div class="choices" data-q="q15">
+          <div class="choice" onclick="selectChoice(this,'q15')"><div class="choice-dot"></div>Ja, sofort</div>
+          <div class="choice" onclick="selectChoice(this,'q15')"><div class="choice-dot"></div>Ja, aber erst wenn es ausgereifter ist</div>
+          <div class="choice" onclick="selectChoice(this,'q15')"><div class="choice-dot"></div>Eher nicht</div>
+        </div>
+      </div>
+
+      <div class="question">
+        <div class="q-label">16. Sonstiges: alles, was du noch loswerden moechtest</div>
+        <div class="q-hint">Kein Minimum, kein Maximum.</div>
+        <textarea id="f-q16" placeholder="Freier Text..."></textarea>
+      </div>
+
+    </div>
+
+    <div class="submit-section">
+      <p>Deine Antworten gehen direkt an Elias. Danke, dass du dir die Zeit genommen hast.</p>
+      <div class="error-msg" id="errorMsg"></div>
+      <button class="btn" id="submitBtn" onclick="submitForm()">Feedback absenden</button>
+    </div>
+  </div>
+
+  <!-- SUCCESS PAGE -->
+  <div id="successPage">
+    <div class="success-icon">&#10003;</div>
+    <h2>Danke fuer dein Feedback!</h2>
+    <p class="lead">Deine Antworten wurden erfolgreich gespeichert und helfen direkt dabei, Synapkey besser zu machen.</p>
+    <div class="success-card">
+      <div class="card-label">Dein Account bleibt aktiv</div>
+      <p>Du kannst Synapkey gerne weiterhin nutzen. Dein Account wird nicht geloescht. Wenn du weitere Bugs findest oder Ideen hast, melde dich jederzeit bei mir.</p>
+    </div>
+    <p style="font-size:13px; color:var(--muted);">Elias &nbsp;·&nbsp; <a href="https://synapkey.app" style="color:var(--accent); text-decoration:none;">synapkey.app</a></p>
+  </div>
+
+  <div class="footer-note" id="footerNote">
+    Synapkey Beta &nbsp;·&nbsp; Erstellt von Elias &nbsp;·&nbsp; <a href="https://synapkey.app">synapkey.app</a>
+  </div>
+
+</div>
+
+<!-- Firebase SDK via CDN -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, addDoc, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const app = initializeApp({
+    apiKey: "AIzaSyARHJU1SMp8idV22Y9BbhwTMa-HqD38AyU",
+    authDomain: "synapkey-umfrage.firebaseapp.com",
+    projectId: "synapkey-umfrage",
+    storageBucket: "synapkey-umfrage.firebasestorage.app",
+    messagingSenderId: "375424557703",
+    appId: "1:375424557703:web:5b683ce5be8ba6f2f50e22"
+  });
+
+  const db = getFirestore(app);
+  window._db         = db;
+  window._addDoc     = addDoc;
+  window._collection = collection;
+</script>
+
+<script>
+  const checked = new Set();
+  const total   = 17;
+
+  function toggleTask(el) {
+    const id = parseInt(el.closest('.task').dataset.id);
+    if (checked.has(id)) { checked.delete(id); el.classList.remove('checked'); }
+    else                  { checked.add(id);    el.classList.add('checked');    }
+    const n = checked.size;
+    document.getElementById('progressFill').style.width = (n / total * 100) + '%';
+    document.getElementById('progressCount').textContent = n + ' / ' + total;
+  }
+
+  function selectScale(el, q) {
+    document.querySelectorAll('[data-q="' + q + '"] .scale-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function selectChoice(el, q) {
+    document.querySelectorAll('[data-q="' + q + '"] .choice').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach((t, i) => {
+      t.classList.toggle('active', (i === 0 && name === 'tasks') || (i === 1 && name === 'form'));
+    });
+    document.querySelectorAll('.tab-content').forEach(c => {
+      c.classList.toggle('active', c.id === 'tab-' + name);
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async function submitForm() {
+    const name   = document.getElementById('f-name').value.trim();
+    const email  = document.getElementById('f-email').value.trim();
+    const device = document.getElementById('f-device').value.trim();
+    const errEl  = document.getElementById('errorMsg');
+
+    if (!name || !email || !device) {
+      errEl.textContent  = 'Bitte fuelle Name, E-Mail und Geraet aus.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    errEl.style.display = 'none';
+    const btn = document.getElementById('submitBtn');
+    btn.disabled    = true;
+    btn.textContent = 'Wird gespeichert...';
+
+    const scales = {};
+    document.querySelectorAll('.scale[data-q]').forEach(el => {
+      const sel = el.querySelector('.scale-btn.selected');
+      scales[el.dataset.q] = sel ? sel.textContent : null;
+    });
+
+    const choices = {};
+    document.querySelectorAll('.choices[data-q]').forEach(el => {
+      const sel = el.querySelector('.choice.selected');
+      choices[el.dataset.q] = sel ? sel.textContent.trim() : null;
+    });
+
+    const data = {
+      zeitpunkt:      new Date().toISOString(),
+      name,
+      email,
+      geraet:         device,
+      aufgaben:       checked.size,
+      skalen:         scales,
+      auswahl:        choices,
+      q9_bugs:        document.getElementById('f-q9').value,
+      q10_fehler:     document.getElementById('f-q10').value,
+      q11_stoerend:   document.getElementById('f-q11').value,
+      q12_positiv:    document.getElementById('f-q12').value,
+      q13_fehlt:      document.getElementById('f-q13').value,
+      q16_sonstiges:  document.getElementById('f-q16').value
+    };
+
+    try {
+      await window._addDoc(window._collection(window._db, 'beta_feedback'), data);
+      document.getElementById('mainTabs').style.display   = 'none';
+      document.getElementById('tab-form').style.display   = 'none';
+      document.getElementById('footerNote').style.display = 'none';
+      document.getElementById('successPage').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      btn.disabled    = false;
+      btn.textContent = 'Feedback absenden';
+      errEl.textContent  = 'Fehler beim Speichern. Bitte versuche es nochmals. (' + err.message + ')';
+      errEl.style.display = 'block';
+    }
+  }
+
+  window.toggleTask   = toggleTask;
+  window.selectScale  = selectScale;
+  window.selectChoice = selectChoice;
+  window.switchTab    = switchTab;
+  window.submitForm   = submitForm;
+</script>
+</body>
+</html>
